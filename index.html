@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flappy Bird</title>
+</head>
+    <button id="btnPlay" onclick="playGame()">Play Game</button>
+
+    <h3>Score: <span id="score">0</span></h3>
+    <canvas id="world" width="500" height="500" style="border: 1px solid black"></canvas>
+
+
+    <script>
+        //Setup
+        var canvas = document.getElementById("world");
+        var context = canvas.getContext("2d");
+        var width = canvas.width;
+        var height = canvas.height;
+        var vy = 10;
+        var x = width/2;
+        var y = height/2;
+        var jarakantarpipa = 150;
+        var lebarpipa = 50;
+        var kecepatanpipa = 2;
+        var menang = true;
+        var score = parseInt(document.getElementById("score").innerText);
+
+        var pipa = [
+            [400, Math.floor(Math.random() * 150) + 50, 0],
+            [500, Math.floor(Math.random() * 150) + 50, 0],
+            [600, Math.floor(Math.random() * 150) + 50, 0],
+            [700, Math.floor(Math.random() * 150) + 50, 0],
+            [800, Math.floor(Math.random() * 150) + 50, 0],
+            [900, Math.floor(Math.random() * 150) + 50, 0],
+        ];
+
+        var bird = new Image();
+        bird.src = "bird.png";
+        wBurung = 30;
+        hBurung = 28;
+
+        function playGame(){
+            setInterval(game, 1000/40);
+
+            window.addEventListener("click", jump);
+
+            window.addEventListener("keypress", function(event){
+                if(event.keyCode == 32){
+                    jump();
+                }
+            })
+
+            function jump(){
+                //Setup Sound
+                var audio = new Audio("jumpeffect.wav");
+                audio.src = "jumpeffect.wav";
+
+                vy = -9;
+
+                audio.play();
+            }
+        }
+
+    function game(){
+        context.clearRect(0,0,width,height);
+
+      if(menang == true){
+          for(i = 0; i < pipa.length; i++){
+              context.fillStyle = "green";
+              context.fillRect(pipa[i][0], 0, lebarpipa, pipa[i][1]); //Pipa Atas
+              context.fillRect(pipa[i][0], pipa[i][1] + jarakantarpipa, lebarpipa, (height - jarakantarpipa) - pipa[i][1]);
+
+              if(pipa[i][0] > (-1 * lebarpipa)){
+                  pipa[i][0] = pipa[i][0] - kecepatanpipa;
+              }
+              else if(pipa[i][0] == (-1 * lebarpipa)){
+                  pipa[i][0] = width + lebarpipa;
+              }
+
+              //Pengecekan Tabrakan
+              if(pipa[i][0] < (x + wBurung) && pipa[i][0] > (x - wBurung) && 
+                  (pipa[i][1] > y || pipa[i][1] + jarakantarpipa <= y + hBurung - 10)){
+                      menang = false;
+                  
+                  alert(`Game Over! Score Anda: ${score}`);
+
+                  location.reload();
+              }
+              else{
+                  score += 1;
+                  document.getElementById("score").innerText = score;
+              }
+          }
+
+          vy = vy + 1;
+          y = y + vy;
+
+          if(y >= height){
+              jump();
+          }
+      }
+
+      context.drawImage(bird,x,y,wBurung,hBurung);
+    }
+
+    </script>
+</body>
+</html>
